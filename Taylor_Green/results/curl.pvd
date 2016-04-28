@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<VTKFile type="Collection" version="0.1">
+  <Collection>
+    <DataSet timestep="0" part="0" file="curl000000.vtu" />
+    <DataSet timestep="1" part="0" file="curl000001.vtu" />
+    <DataSet timestep="2" part="0" file="curl000002.vtu" />
+    <DataSet timestep="3" part="0" file="curl000003.vtu" />
+    <DataSet timestep="4" part="0" file="curl000004.vtu" />
+    <DataSet timestep="5" part="0" file="curl000005.vtu" />
+    <DataSet timestep="6" part="0" file="curl000006.vtu" />
+    <DataSet timestep="7" part="0" file="curl000007.vtu" />
+    <DataSet timestep="8" part="0" file="curl000008.vtu" />
+    <DataSet timestep="9" part="0" file="curl000009.vtu" />
+    <DataSet timestep="10" part="0" file="curl000010.vtu" />
+    <DataSet timestep="11" part="0" file="curl000011.vtu" />
+    <DataSet timestep="12" part="0" file="curl000012.vtu" />
+    <DataSet timestep="13" part="0" file="curl000013.vtu" />
+    <DataSet timestep="14" part="0" file="curl000014.vtu" />
+    <DataSet timestep="15" part="0" file="curl000015.vtu" />
+    <DataSet timestep="16" part="0" file="curl000016.vtu" />
+  </Collection>
+</VTKFile>

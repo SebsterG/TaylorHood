@@ -5,7 +5,7 @@ import numpy as np
 set_log_active(False)
 start_time = time.time()
 
-N = 10
+N = 64
 mesh = BoxMesh(Point(-pi, -pi, -pi), Point(pi, pi, pi), N, N, N)
 #plot(mesh,interactive=True)
 
@@ -43,7 +43,7 @@ class PeriodicBoundary(SubDomain):
             y[0] = x[0]
             y[1] = x[1]
             y[2] = x[2] - 2.0*pi
-V = VectorFunctionSpace(mesh, "CG", 2, constrained_domain=PeriodicBoundary())
+V = VectorFunctionSpace(mesh, "CG", 1, constrained_domain=PeriodicBoundary())
 Q = FunctionSpace(mesh,"CG", 1,constrained_domain=PeriodicBoundary())
 u = TrialFunction(V)
 p = TrialFunction(Q)
@@ -60,20 +60,20 @@ n = FacetNormal(mesh)
 
 nu = 2.0*pi/1000.0 # Re = 1600
 p_0=Expression('1./16.*(cos(2*x[0])+cos(2*x[1]))*(cos(2*x[2])+2)')
-u0 = interpolate(Expression(('sin(x[0])*cos(x[1])*cos(x[2])','-cos(x[0])*sin(x[1])*cos(x[2])',"0")),V)
+u0 = project(Expression(('sin(x[0])*cos(x[1])*cos(x[2])','-cos(x[0])*sin(x[1])*cos(x[2])',"0")),V)
 #print "norm: ",norm(u0)
 #plot(u0)#,interactive=True)
 
 bcs=[]
 bcp=[]
 
-u0 = Function(V)
+
 u1 = Function(V)
 u_star = Function(V)
 p0 = Function(Q)
 p1 = Function(Q)
 
-dt = 0.001
+dt = 0.0001
 rho = Constant(1)
 nu = Constant(nu)
 K = Constant(dt)
@@ -101,8 +101,8 @@ b1 = None; b2 = None; b3 = None
 
 
 e_k = []; dKdt = []; time_array = []
-curlfile = File("curl.pvd")
-T = 1.0
+#curlfile = File("curl.pvd")
+T = 20.0
 t = dt
 counter = 0
 while t < T + DOLFIN_EPS:
@@ -135,9 +135,9 @@ while t < T + DOLFIN_EPS:
     plot(u1)
 
     print "Timestep: ", t
-    if (counter%10==0 or counter%10 == 1):
+    if (counter%100==0 or counter%100 == 1):
         kinetic_e = assemble(0.5*dot(u1,u1)*dx)/(2*pi)**3
-        if (counter%10)==0:
+        if (counter%100)==0:
             kinetic_hold = kinetic_e
             dissipation_e = assemble(nu*inner(grad(u1), grad(u1))*dx) / (2*pi)**3
             print "dissipation: ", dissipation_e
@@ -147,18 +147,13 @@ while t < T + DOLFIN_EPS:
                 e_k.append((kinetic_e))
                 dKdt.append(-(kinetic_e - kinetic_hold)/dt)
                 time_array.append(t)
-                curlfile << project(curl(u1)[2],Q)
+            #    curlfile << project(curl(u1)[2],Q)
     #plot(p1,rescale=True)
     counter+=1
     t += dt
 
 print("--- %s seconds ---" % (time.time() - start_time))
-plt.plot(e_k, label = "kinetic energy")
-axes = plt.gca()
-legend = axes.legend(loc='lower right', shadow=True)
-plt.show()
-plt.plot(dKdt, label = "dissipation")
-axes = plt.gca()
-legend = axes.legend(loc='lower right', shadow=True)
-plt.show()
-np.savetxt('results/dKdt.txt', dKdt, delimiter=',')
+if MPI.rank(mpi_comm_world())==0:
+    np.savetxt('results/IPCS/dKdt.txt', dKdt,delimiter =',')
+    np.savetxt('results/IPCS/e_k.txt', e_k, delimiter = ',')
+    np.savetxt("results/IPCS/time.txt",time, delimiter = "," )

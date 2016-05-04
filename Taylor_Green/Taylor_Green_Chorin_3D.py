@@ -106,14 +106,14 @@ while t < T + DOLFIN_EPS:
     b1 = assemble(L1,tensor=b1)
     [bc.apply(A1,b1) for bc in bcs]
     pc = PETScPreconditioner("jacobi")
-    sol = PETScKrylovSolver("bicgstab",pc)	
+    sol = PETScKrylovSolver("bicgstab",pc)
     sol.solve(A1,u1.vector(),b1)
     #pressure correction
     #solve(a2==L2,p1,bcp,solver_parameters={"linear_solver":"gmres"})
 
     b2 = assemble(L2,tensor=b2)
     [bc.apply(A2,b2) for bc in bcp]
-    solve(A2,p1.vector(),b2,"gmres","hypre_amg")
+    solve(A2,p1.vector(),b2,"gmres","default")
     #print norm(p1)
 
     #last step

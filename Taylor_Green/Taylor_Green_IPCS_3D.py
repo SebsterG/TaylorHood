@@ -5,7 +5,11 @@ import numpy as np
 set_log_active(False)
 start_time = time.time()
 
+<<<<<<< HEAD
 N = 32
+=======
+N = 10
+>>>>>>> cfe9e32ef93c28c82a15895e1125dd58d1f94d5e
 mesh = BoxMesh(Point(-pi, -pi, -pi), Point(pi, pi, pi), N, N, N)
 #plot(mesh,interactive=True)
 
@@ -120,7 +124,9 @@ while t < T + DOLFIN_EPS:
 
     b2 = assemble(L2,tensor = b2)
     [bc.apply(A2,b2) for bc in bcp]
-    solve(A2,p1.vector(),b2,"gmres","hypre_amg")
+    pc3 = PETScPreconditioner("default")
+    sol3 = PETScKrylovSolver("gmres", pc3)
+    solve(A2,p1.vector(),b2)
     #print norm(p1)
 
     #last step

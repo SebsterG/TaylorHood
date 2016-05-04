@@ -5,7 +5,7 @@ import numpy as np
 set_log_active(False)
 start_time = time.time()
 
-N = 32
+N = 10
 mesh = BoxMesh(Point(-pi, -pi, -pi), Point(pi, pi, pi), N, N, N)
 #plot(mesh,interactive=True)
 
@@ -98,15 +98,12 @@ A3 = assemble(a3)
 T = 20
 t = dt
 counter = 0
-dKdt = []
-e_k = []
-time_array = []
-diss = []
-
+dKdt = [];e_k = [];time_array = [];diss = []
+b1 = None ; b2 = None; b3 = None
 while t < T + DOLFIN_EPS:
     # Update pressure boundary condition
     # solve(a1==L1,u1,bcs,solver_parameters={"linear_solver": "gmres"})
-    b1 = assemble(L1)
+    b1 = assemble(L1,tensor=b1)
     [bc.apply(A1,b1) for bc in bcs]
     pc = PETScPreconditioner("jacobi")
     sol = PETScKrylovSolver("bicgstab",pc)	
@@ -114,14 +111,14 @@ while t < T + DOLFIN_EPS:
     #pressure correction
     #solve(a2==L2,p1,bcp,solver_parameters={"linear_solver":"gmres"})
 
-    b2 = assemble(L2)
+    b2 = assemble(L2,tensor=b2)
     [bc.apply(A2,b2) for bc in bcp]
     solve(A2,p1.vector(),b2,"gmres","hypre_amg")
     #print norm(p1)
 
     #last step
     #solve(a3==L3,u1,bcs,solver_parameters={"linear_solver":"gmres"})
-    b3 = assemble(L3)
+    b3 = assemble(L3,tensor=b3)
     [bc.apply(A3,b3) for bc in bcs]
     pc2 = PETScPreconditioner("jacobi")
     sol2 = PETScKrylovSolver("cg",pc2)
@@ -151,6 +148,6 @@ while t < T + DOLFIN_EPS:
 
 print("--- %s seconds ---" % (time.time() - start_time))
 
-np.savetxt('results/chorin/dKdt.txt', dKdt, delimiter=',')
-np.savetxt('results/chorin/E_k.txt', e_k, delimiter=',')
-np.savetxt('results/chorin/time.txt',time_array , delimiter=',')
+np.savetxt('results/chorin/dKdt_10.txt', dKdt, delimiter=',')
+np.savetxt('results/chorin/E_k_10.txt', e_k, delimiter=',')
+np.savetxt('results/chorin/time._10txt',time_array , delimiter=',')

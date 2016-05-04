@@ -5,7 +5,7 @@ import numpy as np
 set_log_active(False)
 start_time = time.time()
 
-N = 64
+N = 32
 mesh = BoxMesh(Point(-pi, -pi, -pi), Point(pi, pi, pi), N, N, N)
 #plot(mesh,interactive=True)
 
@@ -43,7 +43,7 @@ class PeriodicBoundary(SubDomain):
             y[0] = x[0]
             y[1] = x[1]
             y[2] = x[2] - 2.0*pi
-V = VectorFunctionSpace(mesh, "CG", 1, constrained_domain=PeriodicBoundary())
+V = VectorFunctionSpace(mesh, "CG", 2, constrained_domain=PeriodicBoundary())
 Q = FunctionSpace(mesh,"CG", 1,constrained_domain=PeriodicBoundary())
 u = TrialFunction(V)
 p = TrialFunction(Q)
@@ -58,7 +58,7 @@ n = FacetNormal(mesh)
 #plot(bound,interactive=True)
 
 
-nu = 2.0*pi/1000.0 # Re = 1600
+nu = 1.0/1000.0 # Re = 1600
 p_0=Expression('1./16.*(cos(2*x[0])+cos(2*x[1]))*(cos(2*x[2])+2)')
 u0 = project(Expression(('sin(x[0])*cos(x[1])*cos(x[2])','-cos(x[0])*sin(x[1])*cos(x[2])',"0")),V)
 #print "norm: ",norm(u0)
@@ -73,7 +73,7 @@ u_star = Function(V)
 p0 = Function(Q)
 p1 = Function(Q)
 
-dt = 0.0001
+dt = 1.0/1000.0
 rho = Constant(1)
 nu = Constant(nu)
 K = Constant(dt)
@@ -139,8 +139,8 @@ while t < T + DOLFIN_EPS:
         kinetic_e = assemble(0.5*dot(u1,u1)*dx)/(2*pi)**3
         if (counter%100)==0:
             kinetic_hold = kinetic_e
-            dissipation_e = assemble(nu*inner(grad(u1), grad(u1))*dx) / (2*pi)**3
-            print "dissipation: ", dissipation_e
+            #dissipation_e = assemble(nu*inner(grad(u1), grad(u1))*dx) / (2*pi)**3
+            #print "dissipation: ", dissipation_e
             print "kinetic energy", kinetic_e
         else: # (counter%100)==1:
             if MPI.rank(mpi_comm_world())==0:
@@ -154,6 +154,6 @@ while t < T + DOLFIN_EPS:
 
 print("--- %s seconds ---" % (time.time() - start_time))
 if MPI.rank(mpi_comm_world())==0:
-    np.savetxt('results/IPCS/dKdt.txt', dKdt,delimiter =',')
-    np.savetxt('results/IPCS/e_k.txt', e_k, delimiter = ',')
-    np.savetxt("results/IPCS/time.txt",time, delimiter = "," )
+    np.savetxt('results/IPCS/dKdt_32.txt', dKdt,delimiter =',')
+    np.savetxt('results/IPCS/e_k_32.txt', e_k, delimiter = ',')
+    np.savetxt("results/IPCS/time_32.txt",time, delimiter = "," )
